@@ -3,7 +3,7 @@
 FASTQ_TOOL
 """
 
-from typing import List, Union, Tuple, Optional
+from typing import Union
 
 
 def calc_gc(seq: str) -> float:
@@ -40,8 +40,8 @@ def calc_mean_quality(seq_quality: str) -> float:
 def fastq_filter(
         seqs: dict,
         gc_bounds: Union[tuple, float] = (0, 100),
-        length_bounds: Union[tuple, float] = (0, 2**32),
-        quality_threshold: int = 0
+        length_bounds: Union[tuple, int] = (0, 2**32),
+        quality_threshold: float = 0
         ) -> dict:
     """
     a filter function to sort out the sequences that pass the setting.
