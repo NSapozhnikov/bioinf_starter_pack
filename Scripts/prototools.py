@@ -10,83 +10,83 @@ from typing import List, Optional, Tuple, Union
 AMINOACIDS_DICT = {
     'Ala': {'one_letter_code': 'A',
             'coding_RNAs': {'GCU', 'GCC', 'GCA', 'GCG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.01,
             'molecular_weights': 89},
     'Arg': {'one_letter_code': 'R',
             'coding_RNAs': {'CGU', 'CGC', 'CGA', 'CGG', 'AGA', 'AGG'},
-            'pKa_aminoacids': 12.4,
+            'pKa': 10.76,
             'molecular_weights': 174},
     'Asn': {'one_letter_code': 'N',
             'coding_RNAs': {'AAU', 'AAC'},
-            'pKa_aminoacids': 3.2,
+            'pKa': 5.41,
             'molecular_weights': 132},
     'Asp': {'one_letter_code': 'D',
             'coding_RNAs': {'GAU', 'GAC'},
-            'pKa_aminoacids': 3.9,
+            'pKa': 2.85,
             'molecular_weights': 133},
     'Cys': {'one_letter_code': 'C',
             'coding_RNAs': {'UGU', 'UGC'},
-            'pKa_aminoacids': 8.3,
+            'pKa': 5.05,
             'molecular_weights': 121},
     'Glu': {'one_letter_code': 'E',
             'coding_RNAs': {'GAA', 'GAG'},
-            'pKa_aminoacids': 4.3,
+            'pKa': 3.15,
             'molecular_weights': 147},
     'Gln': {'one_letter_code': 'Q',
             'coding_RNAs': {'CAA', 'CAG'},
-            'pKa_aminoacids': 3.2,
+            'pKa': 5.65,
             'molecular_weights': 146},
     'Gly': {'one_letter_code': 'G',
             'coding_RNAs': {'GGU', 'GGC', 'GGA', 'GGG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.06,
             'molecular_weights': 75},
     'His': {'one_letter_code': 'H',
             'coding_RNAs': {'CAU', 'CAC'},
-            'pKa_aminoacids': 6.0,
+            'pKa': 7.60,
             'molecular_weights': 155},
     'Ile': {'one_letter_code': 'I',
             'coding_RNAs': {'AUU', 'AUC', 'AUA'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.05,
             'molecular_weights': 131},
     'Leu': {'one_letter_code': 'L',
             'coding_RNAs': {'CUU', 'CUC', 'CUA', 'CUG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.01,
             'molecular_weights': 131},
     'Lys': {'one_letter_code': 'K',
             'coding_RNAs': {'AAA', 'AAG'},
-            'pKa_aminoacids': 10.5,
+            'pKa': 9.60,
             'molecular_weights': 146},
     'Met': {'one_letter_code': 'M',
             'coding_RNAs': {'AUG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 5.74,
             'molecular_weights': 149},
     'Phe': {'one_letter_code': 'F',
             'coding_RNAs': {'UUU', 'UUC'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 5.49,
             'molecular_weights': 165},
     'Pro': {'one_letter_code': 'P',
             'coding_RNAs': {'CCU', 'CCC', 'CCA', 'CCG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.30,
             'molecular_weights': 115},
     'Ser': {'one_letter_code': 'S',
             'coding_RNAs': {'UCU', 'UCC', 'UCA', 'UCG'},
-            'pKa_aminoacids': 2.2,
+            'pKa': 5.68,
             'molecular_weights': 105},
     'Thr': {'one_letter_code': 'T',
             'coding_RNAs': {'ACU', 'ACC', 'ACA', 'ACG'},
-            'pKa_aminoacids': 2.6,
+            'pKa': 5.60,
             'molecular_weights': 119},
     'Tyr': {'one_letter_code': 'W',
             'coding_RNAs': {'UAU', 'UAC'},
-            'pKa_aminoacids': 11.0,
+            'pKa': 5.64,
             'molecular_weights': 181},
     'Trp': {'one_letter_code': 'Y',
             'coding_RNAs': {'UGG'},
-            'pKa_aminoacids': 10.1,
+            'pKa': 5.89,
             'molecular_weights': 204},
     'Val': {'one_letter_code': 'V',
             'coding_RNAs': {'GUU', 'GUC', 'GUA', 'GUG'},
-            'pKa_aminoacids': 0.0,
+            'pKa': 6.0,
             'molecular_weights': 117},
 }
 
@@ -277,7 +277,7 @@ def local_alignment(seq_on: str,
             'gaps': counter_gaps}
 
 
-def calc_protein_molecular_weight(seq: str) -> float:
+def calc_mw(seq: str) -> float:
     """
     Args:
     - seq - a sequence to calculate molecular weight of
@@ -296,7 +296,7 @@ def calc_protein_molecular_weight(seq: str) -> float:
     return protein_weight
 
 
-def from_proteins_seqs_to_rna(seq: str) -> set:
+def prot_to_rna(seq: str) -> set:
     """
     List all possible RNAs for a given protein sequence
     Args:
@@ -316,50 +316,89 @@ def from_proteins_seqs_to_rna(seq: str) -> set:
     return set(rna_sequences)
 
 
-def calculate_pI(seq: str) -> float:
+def calculate_pI(seq: str,
+                 pH_range: tuple = (0, 14),
+                 pH: float = 6.5,
+                 pH_step: float = 0.01) -> float:
     """
     Calculates an isoelectric point (pI) for a given sequence
 
     Args:
     - seq - a sequence of a protein to calculate pI for
+    - pH_range - defaulted to (0, 14), lower and upper boundaries for pH
+    to look in
+    - pH - supossed starting pH value
+    - pH_step - an incremental step for the search
 
     Returns:
     - pI - a pH when the net charge of a given sequence equals 0
     """
-    pKa_NH2 = 8.0
-    pKa_COOH = 3.1
-    step = 0.01
-    pH = 0
-    charge = 0.0
 
-    # Iterate through a range of pH values to find the isoelectric point
-    while pH <= 14:
-        # Calculate the charge contributed by ionizable groups at this pH
-        for amino_acid in seq:
-            if amino_acid == 'D' or amino_acid == 'E':
-                charge += 1 / (1 + 10 ** (pKa_side_chains[amino_acid] - pH))
-            elif amino_acid == 'H':
-                charge += 1 / (1 + 10 ** (pH - pKa_side_chains[amino_acid]))
-            elif amino_acid == 'K' or amino_acid == 'R':
-                charge += 1 / (1 + 10 ** (pH - pKa_side_chains[amino_acid]))
+    pH_lower, pH_upper = pH_range[0], pH_range[1]
 
-        # Calculate the charge contributed by the N-terminus and C-terminus
-        charge_NH2 = 1 / (1 + 10 ** (pKa_NH2 - pH))
-        charge_COOH = -1 / (1 + 10 ** (pH - pKa_COOH))
+    asp_count: int = 0
+    glu_count: int = 0
+    cys_count: int = 0
+    tyr_count: int = 0
+    his_count: int = 0
+    lys_count: int = 0
+    arg_count: int = 0
 
-        # Calculate the net charge at this pH
-        net_charge = charge + charge_NH2 + charge_COOH
+    for aminoacid in [seq[i:i + 3] for i in range(0, len(seq), 3)]:
+        match aminoacid:
+            case 'Asp':
+                asp_count += 1
+            case 'Glu':
+                glu_count += 1
+            case 'Cys':
+                cys_count += 1
+            case 'Tyr':
+                tyr_count += 1
+            case 'His':
+                his_count += 1
+            case 'Lys':
+                lys_count += 1
+            case 'Arg':
+                arg_count += 1
 
-        # Check if the net charge is close to zero (within a tolerance)
-        if abs(net_charge) < 0.01:
-            return pH
+    while not ((pH - pH_lower < pH_step) &
+               (pH_upper - pH < pH_step)):
+        # Negatives
+        c_term = -1 / (1 + 10 ** (3.65 - pH))
+        asp_q = -asp_count / (1 + 10 ** (AMINOACIDS_DICT['Asp']['pKa'] - pH))
+        glu_q = -glu_count / (1 + 10 ** (AMINOACIDS_DICT['Glu']['pKa'] - pH))
+        cys_q = -cys_count / (1 + 10 ** (AMINOACIDS_DICT['Cys']['pKa'] - pH))
+        tyr_q = -tyr_count / (1 + 10 ** (AMINOACIDS_DICT['Tyr']['pKa'] - pH))
+        # Positives
+        n_term = 1 / (1 + 10 ** (pH - 8.2))
+        his_q = his_count / (1 + 10 ** (pH - AMINOACIDS_DICT['His']['pKa']))
+        lys_q = lys_count / (1 + 10 ** (pH - AMINOACIDS_DICT['Lys']['pKa']))
+        arg_q = arg_count / (1 + 10 ** (pH - AMINOACIDS_DICT['Arg']['pKa']))
 
-        # Increment pH and reset the charge
-        pH += step
-        charge = 0
+        # Net charge in given pH
+        net_charge: float = (c_term +
+                             asp_q +
+                             glu_q +
+                             cys_q +
+                             tyr_q +
+                             his_q +
+                             n_term +
+                             lys_q +
+                             arg_q)
 
-    # If no pI is found, return None
-    return None
+        # We are out of range, thus the new pH value must be smaller
+        if net_charge < 0:
+            temp = pH
+            pH = pH - ((pH - pH_lower) / 2)
+            pH_upper = temp
+        # We used to small pH value, so we have to increase it
+        else:
+            temp = pH
+            pH = pH + ((pH_upper - pH) / 2)
+            pH_lower = temp
+        if abs(net_charge) < 0.001:
+            break
+    return pH
 
 
 def is_protein(seq: str) -> bool:
@@ -401,21 +440,16 @@ def check_input(*args: Union[List[str], str], method: str) -> \
         seqs_list = list(args)
         valid_seqs_list = []
         seq_on = None
-        if method in ['from_proteins_seqs_to_rna',
+        if method in ['prot_to_rna',
                       'calculate_pI',
-                      'calc_protein_molecular_weight']:
+                      'calc_mw']:
             # Needs protein 3-letter coded
             for seq in seqs_list:
                 if not is_protein(seq):
                     print(seq, ' is not a valid protein.')
                     continue
                 if is_one_letter(seq):
-                    print(f'Warning! Function {method}() needs '
-                          '3-letter encoded sequences. Your sequence '
-                          'will be mutated to a 3-letter encoding.')
                     valid_seqs_list.append(recode(seq))
-                    print(seq, ' sequence has been mutated into: ',
-                          valid_seqs_list[-1])
                 else:
                     valid_seqs_list.append(seq)
             return valid_seqs_list, seq_on
@@ -427,11 +461,6 @@ def check_input(*args: Union[List[str], str], method: str) -> \
                     print(seq, ' is not a valid protein.')
                     continue
                 if not is_one_letter(seq):
-                    print('Warning! Function local_alignment() needs '
-                          '1-letter encoded sequences. Your sequence '
-                          'will be mutated to a 1-letter encoding.')
-                    print(seq, ' sequence has been mutated into: ',
-                          valid_seqs_list[-1])
                     valid_seqs_list.append(recode(seq))
                 else:
                     valid_seqs_list.append(seq)
@@ -455,8 +484,9 @@ def check_input(*args: Union[List[str], str], method: str) -> \
             raise ValueError(method, ' is not a valid method.')
 
 
-def prototools(*args: Tuple[Union[List[str], str]],
-               method: Optional[str] = None) -> dict:
+def run_prototools(*args: Tuple[Union[List[str], str]],
+                   method: Optional[str] = None,
+                   prettify: bool = True) -> dict:
     """
     This function provides the access to the following methods:
 
@@ -470,7 +500,7 @@ def prototools(*args: Tuple[Union[List[str], str]],
        - performs an alignment using Smith-Waterman algorithm
 
     3. Find possible RNA sequences for defined protein sequence - the
-    last argument: 'from_proteins_seqs_to_rna'
+    last argument: 'prot_to_rna'
         - needs an input containing at least 1 3-letter coded aminoacid
         sequence
         - returns a set of RNA codones, which encode this protein
@@ -482,14 +512,16 @@ def prototools(*args: Tuple[Union[List[str], str]],
         - returns a value is an isoelectric point of a given protein
 
     5. Calculate protein molecular weight - the last argument:
-    'calc_protein_molecular_weight'
+    'calc_mw'
         - needs an input containing at least 1 3-letter coded aminoacid
         sequence
         - returns a calculated molecular weight for a given sequence
 
     Args:
     - *args - are supposed to be all sequences to process
-    - method is a kwarg - the method to process with.
+    - method - the method to process with
+    - prettify - defaulted to True - wether to prettify the
+    alignment
 
     Returns:
     function_result - a dictionary with the result of a chosen function
@@ -512,20 +544,20 @@ def prototools(*args: Tuple[Union[List[str], str]],
             for seq in seqs_list:
                 alignments_dict[seq] = local_alignment(seq_on=seq_on,
                                                        seq2=seq,
-                                                       prettify=True)
+                                                       prettify=prettify)
             return alignments_dict
 
-        case 'from_proteins_seqs_to_rna':
+        case 'prot_to_rna':
             possible_rnas_dict: dict = {}
             for seq in seqs_list:
-                possible_rnas_dict[seq] = from_proteins_seqs_to_rna(seq)
+                possible_rnas_dict[seq] = prot_to_rna(seq)
             return possible_rnas_dict
 
-        case 'calc_protein_molecular_weight':
+        case 'calc_mw':
             molecular_weights_dict: dict = {}
             for seq in seqs_list:
                 molecular_weights_dict[seq] = \
-                    calc_protein_molecular_weight(seq)
+                    calc_mw(seq)
             return molecular_weights_dict
 
         case 'calculate_pI':
@@ -537,9 +569,3 @@ def prototools(*args: Tuple[Union[List[str], str]],
 
 if __name__ == '__main__':
     pass
-
-
-
-
-test1 = prototools('AlaTyr', 'A', 'ljadlksg', method='calculate_pI')
-print(test1)

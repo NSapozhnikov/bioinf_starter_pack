@@ -37,7 +37,7 @@ def calc_mean_quality(seq_quality: str) -> float:
     return round(mean_quality, 2)
 
 
-def fastq_filter(
+def run_FASTQ_tools(
         seqs: dict,
         gc_bounds: Union[tuple, float] = (0, 100),
         length_bounds: Union[tuple, int] = (0, 2**32),
