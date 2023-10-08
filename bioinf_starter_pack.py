@@ -6,32 +6,52 @@ is a python toolkit to interact with nucleic acid and protein sequences.
 """
 
 from typing import List, Union, Tuple, Optional
-from Scripts import DNA_RNA_TOOLS, FASTQ_TOOL, prototool
+from Scripts.dna_rna_tools import run_dna_rna_tools
+from Scripts.FASTQ_tools import run_FASTQ_tools
+from Scripts.prototools import run_prototools
 
 
-EXAMPLE_FASTQ = {
-    # 'name' : ('sequence', 'quality')
-    '@SRX079804:1:SRR292678:1:1101:21885:21885': ('ACAGCAACATAAACATGATGGGATGGCGTAAGCCCCCGAGATATCAGTTTACCCAGGATAAGAGATTAAATTATGAGCAACATTATTAA', 'FGGGFGGGFGGGFGDFGCEBB@CCDFDDFFFFBFFGFGEFDFFFF;D@DD>C@DDGGGDFGDGG?GFGFEGFGGEF@FDGGGFGFBGGD'),
-    '@SRX079804:1:SRR292678:1:1101:24563:24563': ('ATTAGCGAGGAGGAGTGCTGAGAAGATGTCGCCTACGCCGTTGAAATTCCCTTCAATCAGGGGGTACTGGAGGATACGAGTTTGTGTG', 'BFFFFFFFB@B@A<@D>BDDACDDDEBEDEFFFBFFFEFFDFFF=CC@DDFD8FFFFFFF8/+.2,@7<<:?B/:<><-><@.A*C>D'),
-    '@SRX079804:1:SRR292678:1:1101:30161:30161': ('GAACGACAGCAGCTCCTGCATAACCGCGTCCTTCTTCTTTAGCGTTGTGCAAAGCATGTTTTGTATTACGGGCATCTCGAGCGAATC', 'DFFFEGDGGGGFGGEDCCDCEFFFFCCCCCB>CEBFGFBGGG?DE=:6@=>A<A>D?D8DCEE:>EEABE5D@5:DDCA;EEE-DCD'),
-    '@SRX079804:1:SRR292678:1:1101:47176:47176': ('TGAAGCGTCGATAGAAGTTAGCAAACCCGCGGAACTTCCGTACATCAGACACATTCCGGGGGGTGGGCCAATCCATGATGCCTTTG', 'FF@FFBEEEEFFEFFD@EDEFFB=DFEEFFFE8FFE8EEDBFDFEEBE+E<C<C@FFFFF;;338<??D:@=DD:8DDDD@EE?EB'),
-    '@SRX079804:1:SRR292678:1:1101:149302:149302': ('TAGGGTTGTATTTGCAGATCCATGGCATGCCAAAAAGAACATCGTCCCGTCCAATATCTGCAACATACCAGTTGGTTGGTA', '@;CBA=:@;@DBDCDEEE/EEEEEEF@>FBEEB=EFA>EEBD=DAEEEEB9)99>B99BC)@,@<9CDD=C,5;B::?@;A'),
-    '@SRX079804:1:SRR292678:1:1101:170868:170868': ('CTGCCGAGACTGTTCTCAGACATGGAAAGCTCGATTCGCATACACTCGCTGAGTAAGAGAGTCACACCAAATCACAGATT', 'E;FFFEGFGIGGFBG;C6D<@C7CDGFEFGFHDFEHHHBBHHFDFEFBAEEEEDE@A2=DA:??C3<BCA7@DCDEG*EB'),
-    '@SRX079804:1:SRR292678:1:1101:171075:171075': ('CATTATAGTAATACGGAAGATGACTTGCTGTTATCATTACAGCTCCATCGCATGAATAATTCTCTAATATAGTTGTCAT', 'HGHHHHGFHHHHFHHEHHHHFGEHFGFGGGHHEEGHHEEHBHHFGDDECEGGGEFGF<FGGIIGEBGDFFFGFFGGFGF'),
-    '@SRX079804:1:SRR292678:1:1101:175500:175500': ('GACGCCGTGGCTGCACTATTTGAGGCACCTGTCCTCGAAGGGAAGTTCATCTCGACGCGTGTCACTATGACATGAATG', 'GGGGGFFCFEEEFFDGFBGGGA5DG@5DDCBDDE=GFADDFF5BE49<<<BDD?CE<A<8:59;@C.C9CECBAC=DE'),
-    '@SRX079804:1:SRR292678:1:1101:190136:190136': ('GAACCTTCTTTAATTTATCTAGAGCCCAAATTTTAGTCAATCTATCAACTAAAATACCTACTGCTACTACAAGTATT', 'DACD@BEECEDE.BEDDDDD,>:@>EEBEEHEFEHHFFHH?FGBGFBBD77B;;C?FFFFGGFED.BBABBG@DBBE'),
-    '@SRX079804:1:SRR292678:1:1101:190845:190845': ('CCTCAGCGTGGATTGCCGCTCATGCAGGAGCAGATAATCCCTTCGCCATCCCATTAAGCGCCGTTGTCGGTATTCC', 'FF@FFCFEECEBEC@@BBBBDFBBFFDFFEFFEB8FFFFFFFFEFCEB/>BBA@AFFFEEEEECE;ACD@DBBEEE'),
-    '@SRX079804:1:SRR292678:1:1101:198993:198993': ('AGTTATTTATGCATCATTCTCATGTATGAGCCAACAAGATAGTACAAGTTTTATTGCTATGAGTTCAGTACAACA', '<<<=;@B??@<>@><48876EADEG6B<A@*;398@.=BB<7:>.BB@.?+98204<:<>@?A=@EFEFFFEEFB'),
-    '@SRX079804:1:SRR292678:1:1101:204480:204480': ('AGTGAGACACCCCTGAACATTCCTAGTAAGACATCTTTGAATATTACTAGTTAGCCACACTTTAAAATGACCCG', '<98;<@@@:@CD@BCCDD=DBBCEBBAAA@9???@BCDBCGF=GEGDFGDBEEEEEFFFF=EDEE=DCD@@BBC')
-    }
+def proto_tools(*args: Tuple[Union[List[str], str]],
+                method: Optional[str] = None) -> dict:
+    """
+    This function provides the access to the following methods:
 
+    1. Translate 1 letter to 3 letter encoding and vice versa - the last
+    argument: 'recode'
+        - needs at least 1 sequence 1- or 3- letter encoded.
+        - returns a recoded sequence
 
-def hw3():
-    pass
+    2. Local Alignment of two sequences - the last argument: 'local_alignment'
+       - needs 2 protein sequences 1-letter encoded.
+       - performs an alignment using Smith-Waterman algorithm
 
+    3. Find possible RNA sequences for defined protein sequence - the
+    last argument: 'prot_to_rna'
+        - needs an input containing at least 1 3-letter coded aminoacid
+        sequence
+        - returns a set of RNA codones, which encode this protein
 
-def hw4():
-    pass
+    4. Determinate isoelectric point - the last argument:
+    'calculate_pI'
+        - needs an input containing at least 1 3-letter coded aminoacid
+        sequence
+        - returns a value is an isoelectric point of a given protein
+
+    5. Calculate protein molecular weight - the last argument:
+    'calc_mw'
+        - needs an input containing at least 1 3-letter coded aminoacid
+        sequence
+        - returns a calculated molecular weight for a given sequence
+
+    Args:
+    - *args - are supposed to be all sequences to process
+    - method is a kwarg - the method to process with.
+
+    Returns:
+    function_result - a dictionary with the result of a chosen function
+    """
+
+    return run_prototools(*args, method=method)
 
 
 def filter_fastq(
@@ -61,7 +81,26 @@ def filter_fastq(
 
     """
 
-    return FASTQ_TOOL.fastq_filter(seqs=seqs,
-                                   gc_bounds=gc_bounds,
-                                   length_bounds=length_bounds,
-                                   quality_threshold=quality_threshold)
+    return run_FASTQ_tools(seqs=seqs,
+                           gc_bounds=gc_bounds,
+                           length_bounds=length_bounds,
+                           quality_threshold=quality_threshold)
+
+
+def nucleic_tools(*seqs: List[str]) -> List[str]:
+    """
+    This function processes sequences with one of the available methods:
+    1. 'transcribe'
+    2. 'reverse'
+    3. 'complement'
+    4. 'reverse_complement'
+
+    Args:
+    - seqs - DNA or RNA sequences
+    - method - a valid method to use
+
+    Returns:
+    - processed sequence or a list of processed sequences
+    """
+
+    return run_dna_rna_tools(*seqs)
