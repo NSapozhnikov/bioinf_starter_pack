@@ -57,8 +57,8 @@ def proto_tools(*args: Tuple[Union[List[str], str]],
 def filter_fastq(
         seqs: dict,
         gc_bounds: Union[tuple, float] = (0, 100),
-        length_bounds: Union[tuple, float] = (0, 2**32),
-        quality_threshold: int = 0
+        length_bounds: Union[tuple, int] = (0, 2**32),
+        quality_threshold: float = 0
         ) -> dict:
     """
     a filter function to sort out the sequences that pass the setting.
