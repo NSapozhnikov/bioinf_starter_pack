@@ -7,7 +7,7 @@ is a python toolkit to interact with nucleic acid and protein sequences.
 
 from typing import List, Union, Tuple, Optional
 from Scripts.dna_rna_tools import run_dna_rna_tools
-from Scripts.FASTQ_tools import run_FASTQ_tools
+from Scripts.fastq_tools import run_fastq_tools
 from Scripts.prototools import run_prototools
 
 
@@ -81,7 +81,7 @@ def filter_fastq(
 
     """
 
-    return run_FASTQ_tools(seqs=seqs,
+    return run_fastq_tools(seqs=seqs,
                            gc_bounds=gc_bounds,
                            length_bounds=length_bounds,
                            quality_threshold=quality_threshold)

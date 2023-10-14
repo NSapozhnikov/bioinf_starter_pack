@@ -107,9 +107,10 @@ def write_fastq(filtered_fastq: dict,
     None
     """
 
-    with open(os.path.join('fastq_filtrator_resuls', output_filename),
-              'w',
-              encoding='utf-8') as out_file:
+    if not os.path.exists('fastq_filtrator_resuls'):
+        os.makedirs('fastq_filtrator_resuls')
+    out_path = os.path.join('fastq_filtrator_resuls', output_filename)
+    with open(out_path, 'w', encoding='utf-8') as out_file:
         for entry in filtered_fastq.items():
             out_file.write(entry[0] + '\n')
             for seq_row in entry[1]:
@@ -169,5 +170,3 @@ def run_fastq_tools(
 
 if __name__ == '__main__':
     pass
-
-test = run_fastq_tools(os.path.join('example_data', 'example_fastq.fastq'))
