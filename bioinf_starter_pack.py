@@ -55,18 +55,19 @@ def proto_tools(*args: Tuple[Union[List[str], str]],
 
 
 def filter_fastq(
-        seqs: dict,
+        input_path: str,
+        output_filename: Optional[str] = None,
         gc_bounds: Union[tuple, float] = (0, 100),
         length_bounds: Union[tuple, int] = (0, 2**32),
         quality_threshold: float = 0
-        ) -> dict:
+        ) -> None:
     """
     a filter function to sort out the sequences that pass the setting.
 
     Args:
-    - *seqs - an unlimited amount of sequences in a dictionary where key is
-    the name of a sequence and the value is a tuple of strings
-    (sequence, quality)
+    - input_path - a file path to the .fastq file
+    - output_filename - a file path to the output file. If none is given
+    using the same name as input
     - gc_bounds - defaulted to (0, 100) - GC ratio threshold. Can be either
     a tuple or a float, if latter it will be the upper boundary
     - length_bounds - defaulted to (0, 2**32) - seqeunces length range. Can be
@@ -81,7 +82,8 @@ def filter_fastq(
 
     """
 
-    return run_fastq_tools(seqs=seqs,
+    return run_fastq_tools(input_path=input_path,
+                           output_filename=output_filename,
                            gc_bounds=gc_bounds,
                            length_bounds=length_bounds,
                            quality_threshold=quality_threshold)
